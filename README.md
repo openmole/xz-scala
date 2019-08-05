@@ -17,7 +17,7 @@ inputFile.compressXZ(xzFile)
 import org.tukaani.xz._
 
 val xzfile = new File(path/to/xzFile)
-val outputFile = new File(outputFile)
+val outputFile = new File(path/to/outputFile)
 
 xzfile.extractXZ(outputFile)
 ```
