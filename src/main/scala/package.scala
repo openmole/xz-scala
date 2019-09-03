@@ -1,6 +1,7 @@
-package org.tukaani
+package fr.iscpif
 
 import java.io._
+import org.tukaani.xz._
 
 package object xz {
 
@@ -11,7 +12,7 @@ package object xz {
       else {
         val inputStream = new FileInputStream(file)
         val outputStream = new FileOutputStream(to)
-        val inxz = new XZInputStream(inputStream, 100 * 1024)
+        val inxz = extractToStream
 
         val buffer = new Array[Byte](inputStream.available)
         Iterator.continually(inxz.read(buffer)).takeWhile(_ != -1).foreach {
@@ -22,25 +23,29 @@ package object xz {
       }
     }
 
-    def compressXZ(to: File) = {
-
-      val outfile = new FileOutputStream(to)
-      val outxz = new XZOutputStream(outfile, new LZMA2Options(8), XZ.CHECK_SHA256)
-
-        println("ff " + file.getAbsolutePath)
-        val infile = new FileInputStream(file)
-        val buffer = new Array[Byte](8192)
-
-        Iterator.continually(infile.read(buffer)).takeWhile(_ != -1).foreach { size =>
-          // inxz.read(buffer)
-          println("SIze " + size)
-          println("write " + buffer.toString)
-          outxz.write(buffer, 0, size)
-        }
-
-      outxz.finish
+    def extractToStream: InputStream = {
+      if (!file.getName.endsWith(".xz")) throw new java.io.IOException(s"$file is not a XZ file")
+      else {
+        val inputStream = new FileInputStream(file)
+        new XZInputStream(inputStream, 100 * 1024)
+      }
     }
+
+  def compressXZ(to: File) = {
+
+    val outfile = new FileOutputStream(to)
+    val outxz = new XZOutputStream(outfile, new LZMA2Options(8), XZ.CHECK_SHA256)
+
+    val infile = new FileInputStream(file)
+    val buffer = new Array[Byte](8192)
+
+    Iterator.continually(infile.read(buffer)).takeWhile(_ != -1).foreach { size =>
+      outxz.write(buffer, 0, size)
+    }
+
+    outxz.finish
   }
+}
 
 //  def compress(files: Seq[File], to: File) = {
 //

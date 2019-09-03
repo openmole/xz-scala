@@ -1,4 +1,4 @@
-package org.tukaani.xz
+package fr.iscpif.xz
 
 import java.io._
 
